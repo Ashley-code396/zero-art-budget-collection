@@ -1,4 +1,4 @@
-/*
+
 #[test_only]
 module zero_art_budget::zero_art_budget_tests;
 // uncomment this line to import the module
@@ -15,4 +15,4 @@ fun test_zero_art_budget() {
 fun test_zero_art_budget_fail() {
     abort ENotImplemented
 }
-*/
+
