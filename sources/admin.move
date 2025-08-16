@@ -26,7 +26,8 @@ fun init(otw: ADMIN, ctx: &mut TxContext) {
     transfer::transfer(admin_cap, ctx.sender())
 }
 
-public fun issue_admin_cap(_index_ofcap: &SuperAdminCap, recipient: address, ctx: &mut TxContext) {
+#[allow(unused_variable)]
+public fun issue_admin_cap(cap: &SuperAdminCap, recipient: address, ctx: &mut TxContext) {
     let admin_cap = internal_create_admins(ctx);
     transfer::transfer(admin_cap, recipient);
 }
