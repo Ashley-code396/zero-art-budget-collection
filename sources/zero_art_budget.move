@@ -17,7 +17,7 @@ const COLLECTION_SIZE: u16 = 100;
 
 public struct ZERO_ART_BUDGET has drop{}
 
-public struct Zeroartbudget has key, store{
+public struct ZeroArtBudget has key, store{
     id: UID,
     number: u16,
     image: Option<String>,
@@ -36,10 +36,10 @@ public struct Registry has key, store{
 }
 
 #[allow(lint(share_owned))]
-fun init(otw: ZERO_ART_BUDGET, ctx: &mut TxContext){
+fun init(otw: ZERO_ART_BUDGET, ctx: &mut TxContext){  
     let publisher = package::claim(otw, ctx);
 
-    let mut display = display::new<Zeroartbudget>(&publisher, ctx);
+    let mut display = display::new<ZeroArtBudget>(&publisher, ctx);
     display.add(b"name".to_string(), b"ZeroArtBudget #{number}".to_string());
     display.add(b"description".to_string(), 
     b"Created by a developer with zero budget, zero artistic instincts, but 100% love for experimenting".to_string());
@@ -50,7 +50,7 @@ fun init(otw: ZERO_ART_BUDGET, ctx: &mut TxContext){
     display.add(b"kiosk_owner_cap_id".to_string(), b"{kiosk_owner_cap_id}".to_string());
     display.update_version();
 
-   let (policy, cap) = transfer_policy::new<Zeroartbudget>(&publisher, ctx);
+   let (policy, cap) = transfer_policy::new<ZeroArtBudget>(&publisher, ctx);
 
    let registry = Registry {
     id: object::new(ctx),
@@ -79,15 +79,15 @@ public(package) fun make_collection(
     admin: &AdminCap,
     registry: &mut Registry,
     ctx: &mut TxContext
-    ) :vector<Zeroartbudget>{
+    ) :vector<ZeroArtBudget>{
         admin.verify_admin(ctx);
 
         let mut number = 1;
-        let mut pfps = vector::empty<Zeroartbudget>();
+        let mut pfps = vector::empty<ZeroArtBudget>();
         while(number<=COLLECTION_SIZE){
 
             let (mut kiosk, kiosk_owner_cap) = kiosk::new(ctx);
-            let pfp = Zeroartbudget{
+            let pfp = ZeroArtBudget{
                 id: object::new(ctx),
                 number: number,
                 image: option::none(),
@@ -114,11 +114,6 @@ public(package) fun make_collection(
 
 
 }
-
-
-
-
-
 
 
 
