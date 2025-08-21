@@ -5,9 +5,7 @@ use zero_art_budget::attributes::{Attributes};
 use sui::table_vec;
 use sui::package;
 use sui::display;
-use sui::transfer_policy;
 use zero_art_budget::admin::{AdminCap};
-//use sui::kiosk;
 use sui::table_vec::TableVec;
 use sui::event;
 
@@ -24,9 +22,6 @@ public struct ZeroArtBudget has key, store{
     image: Option<String>,
     attributes: Option<Attributes>,
     minted_by: Option<address>,
-    //kiosk_id: ID,
-    //kiosk_owner_cap_id: ID
-
 
 }
 
@@ -64,7 +59,6 @@ fun init(otw: ZERO_ART_BUDGET, ctx: &mut TxContext){
     display.add(b"kiosk_owner_cap_id".to_string(), b"{kiosk_owner_cap_id}".to_string());
     display.update_version();
 
-   let (policy, cap) = transfer_policy::new<ZeroArtBudget>(&publisher, ctx);
 
     let mut inventory = Inventory {
         id: object::new(ctx),
@@ -88,9 +82,9 @@ fun init(otw: ZERO_ART_BUDGET, ctx: &mut TxContext){
     transfer::public_share_object(inventory);
     transfer::public_transfer(publisher, SUPERADMIN);
     transfer::public_transfer(display, SUPERADMIN);
-    transfer::public_transfer(cap, SUPERADMIN);
+   
     
-    transfer::public_share_object(policy);
+    
 
 }
 
@@ -102,24 +96,31 @@ public fun make_collection(admin: &AdminCap, inventory: &mut Inventory, ctx: &mu
     
 
     while (number <= COLLECTION_SIZE) {
-        //let (mut kiosk, kiosk_owner_cap) = kiosk::new(ctx);
+        
         let pfp = ZeroArtBudget {
             id: object::new(ctx),
             number,
             image: option::none(),
             attributes: option::none(),
             minted_by: option::none(),
-            //kiosk_id: object::id(&kiosk),
-            //kiosk_owner_cap_id: object::id(&kiosk_owner_cap),
+    
         };
 
-        //kiosk.set_owner_custom(&kiosk_owner_cap, object::id_address(&pfp));
-        //transfer::public_transfer(kiosk_owner_cap, object::id_to_address(&object::id(&pfp)));
-        //transfer::public_share_object(kiosk);
 
         table_vec::push_back(&mut inventory.pfps, pfp);
         number = number + 1;
     };
 
-    
+    inventory.is_initialised = true;
+}
+
+
+public(package) fun pop_back_pfp(inventory: &mut Inventory) :ZeroArtBudget{
+    table_vec::pop_back(&mut inventory.pfps)
+
+}
+
+
+public(package)  fun public_mint_payment(inventory: &Inventory) :u64{
+    inventory.public_mint_price
 }
