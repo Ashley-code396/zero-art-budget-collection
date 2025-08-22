@@ -50,6 +50,16 @@ public fun issue_whitelist_ticket(admin: &AdminCap, beneficiary: address, ctx: &
     transfer::public_transfer(whitelist_ticket, beneficiary);
 }
 
+public fun admin_destroy_whitelist_ticket(
+    admin: &AdminCap,
+    whitelist: WhitelistTicket,
+    ctx: &mut TxContext,
+) {
+    admin.verify_admin(ctx);
+    let WhitelistTicket { id } = whitelist;
+    id.delete()
+}
+
 #[allow(unused_let_mut, lint(self_transfer))]
 
 public fun public_mint(
@@ -58,7 +68,10 @@ public fun public_mint(
     _policy: &mut TransferPolicy<ZeroArtBudget>,
     ctx: &mut TxContext,
 ) {
-    assert!(payment.value()<2000000000, EInsufficientPublicMintPrice);
+    assert!(
+        payment.value() == zero_art_budget::public_mint_payment(inventory),
+        EInsufficientPublicMintPrice,
+    );
 
     let (mut kiosk, kiosk_owner_cap) = kiosk::new(ctx);
     let mut pfp = zero_art_budget::pop_back_pfp(inventory);
@@ -67,7 +80,7 @@ public fun public_mint(
     transfer::public_transfer(kiosk_owner_cap, ctx.sender());
     transfer::public_share_object(kiosk);
 
-    transfer::public_transfer(payment, SUPERADMIN);
+    transfer::public_transfer(payment, @ashlee_treasury);
 }
 
 #[allow(unused_let_mut, lint(self_transfer))]
@@ -78,7 +91,10 @@ public fun whitelist_mint(
     inventory: &mut Inventory,
     ctx: &mut TxContext,
 ) {
-    assert!(payment.value()<1000000000, EInsufficientWhitelistMintPrice);
+    assert!(
+        payment.value() == zero_art_budget::whitelist_mint_payment(inventory),
+        EInsufficientWhitelistMintPrice,
+    );
 
     let (mut kiosk, kiosk_owner_cap) = kiosk::new(ctx);
     let mut pfp = zero_art_budget::pop_back_pfp(inventory);
@@ -88,7 +104,7 @@ public fun whitelist_mint(
     transfer::public_transfer(kiosk_owner_cap, ctx.sender());
     transfer::public_share_object(kiosk);
 
-    transfer::public_transfer(payment, SUPERADMIN);
+    transfer::public_transfer(payment, @ashlee_treasury);
 
     let WhitelistTicket { id } = whitelist;
     id.delete();
